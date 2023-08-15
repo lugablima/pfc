@@ -9,7 +9,8 @@
     "dev": "npm run env:dev -- npx prisma migrate dev && npm run env:dev -- nodemon ./src/server.ts",
     "build": "npx tsc && npx prisma migrate deploy",
     "env:test": "dotenv -e .env.test",
-    "test": "npm run env:test -- prisma migrate dev && npm run env:test -- jest --no-cache -runInBand"
+    "test": "npm run env:test -- prisma migrate dev && npm run env:test -- jest --no-cache -runInBand",
+    "prisma:studio:dev": "npm run env:dev -- npx prisma studio"
   },
   "keywords": [],
   "author": "",
