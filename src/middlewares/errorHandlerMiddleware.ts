@@ -6,5 +6,9 @@ export default function errorHandlerMiddleware(error: Error, _: any, res: Respon
     return res.status(409).send(error.message);
   }
 
+  if (error.name === "unauthorized") {
+    return res.status(401).send(error.message);
+  }
+
   return res.status(500).send(error);
 }
