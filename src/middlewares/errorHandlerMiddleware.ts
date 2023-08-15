@@ -10,5 +10,9 @@ export default function errorHandlerMiddleware(error: Error, _: any, res: Respon
     return res.status(401).send(error.message);
   }
 
+  if (error.name === "bad_request") {
+    return res.status(404).send(error.message);
+  }
+
   return res.status(500).send(error);
 }

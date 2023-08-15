@@ -9,3 +9,7 @@ export type SignInUser = Omit<SignUpUser, "name">;
 export interface UserToken {
   token: string;
 }
+
+export interface JWTPayload {
+  userId: string;
+}

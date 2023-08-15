@@ -9,3 +9,7 @@ export function unauthorized(message = ""): Error {
 export function internalServer(message = ""): Error {
   return { name: "internal_server_error", message };
 }
+
+export function badRequest(message = ""): Error {
+  return { name: "bad_request", message };
+}
