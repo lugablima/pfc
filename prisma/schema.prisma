@@ -25,11 +25,13 @@ model User {
 }
 
 model Module {
-  id        String   @id @default(uuid())
-  name      String   @unique
-  isEnabled Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String
+  imageUrl    String
+  isEnabled   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   classes Class[]
 
@@ -39,6 +41,7 @@ model Module {
 model Class {
   id        String   @id @default(uuid())
   name      String
+  imageUrl  String
   isEnabled Boolean  @default(true)
   moduleId  String
   dueDate   DateTime
