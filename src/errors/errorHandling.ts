@@ -13,3 +13,7 @@ export function internalServer(message = ""): Error {
 export function badRequest(message = ""): Error {
   return { name: "bad_request", message };
 }
+
+export function notFound(message = ""): Error {
+  return { name: "not_found", message };
+}

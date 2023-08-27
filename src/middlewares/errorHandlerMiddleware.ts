@@ -11,6 +11,10 @@ export default function errorHandlerMiddleware(error: Error, _: any, res: Respon
   }
 
   if (error.name === "bad_request") {
+    return res.status(400).send(error.message);
+  }
+
+  if (error.name === "not_found") {
     return res.status(404).send(error.message);
   }
 
