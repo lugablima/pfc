@@ -1,4 +1,4 @@
-import { ModulePayload } from "../types/moduleTypes";
+import { GetAllModules, ModulePayload } from "../types/moduleTypes";
 import * as moduleRepository from "../repositories/moduleRepository";
 import * as classRepository from "../repositories/classRepository";
 import * as errorHandling from "../errors/errorHandling";
@@ -59,4 +59,10 @@ export async function create(module: ModulePayload) {
       await classRepository.insertOne({ ..._class, moduleId, dueDate: moment.parseZone(_class.dueDate).toDate() }, tx);
     }
   });
+}
+
+export async function getAll(): Promise<GetAllModules[] | null> {
+  const modules = await moduleRepository.getAll();
+
+  return modules;
 }

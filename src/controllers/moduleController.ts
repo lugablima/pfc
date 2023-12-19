@@ -7,3 +7,9 @@ export async function create(req: Request, res: Response) {
 
   res.status(201).send("Module created successfully!");
 }
+
+export async function getAll(req: Request, res: Response) {
+  const modules = await moduleService.getAll();
+
+  res.status(200).send(modules);
+}

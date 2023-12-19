@@ -6,6 +6,7 @@ import * as moduleController from "../controllers/moduleController";
 
 const moduleRouter: Router = Router();
 
+moduleRouter.get("/", moduleController.getAll);
 moduleRouter.use(validateAdmin);
 moduleRouter.post("/", validateSchema(moduleSchema), moduleController.create);
 
