@@ -3,6 +3,8 @@ import moment from "moment";
 import { ClassPayload } from "../types/classTypes";
 import * as moduleRepository from "../repositories/moduleRepository";
 import * as classRepository from "../repositories/classRepository";
+import * as videoService from "./videoService";
+import * as summaryService from "./summaryService";
 import * as errorHandling from "../errors/errorHandling";
 
 async function validateModuleId(_class: ClassPayload) {
@@ -21,7 +23,7 @@ async function validateClassNameConflictInModule(_class: ClassPayload) {
   }
 }
 
-async function validateDueDate(_class: ClassPayload) {
+export async function validateDueDate(_class: ClassPayload) {
   const dueDate = moment.utc(_class.dueDate);
   const now = moment.utc();
 
@@ -30,12 +32,20 @@ async function validateDueDate(_class: ClassPayload) {
   }
 }
 
-export async function create(_class: ClassPayload) {
+export async function validateClass(_class: ClassPayload) {
   await validateModuleId(_class);
 
   await validateClassNameConflictInModule(_class);
 
   await validateDueDate(_class);
+}
+
+export async function create(_class: ClassPayload) {
+  await validateClass(_class);
+
+  await videoService.validateVideo(_class.videoUrl);
+
+  await summaryService.validateSummary(_class.summaryUrl);
 
   await classRepository.insertOne(_class);
 }
