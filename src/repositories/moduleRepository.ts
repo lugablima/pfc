@@ -15,6 +15,7 @@ export async function findOneByName(name: string): Promise<TModule | null> {
 
 export async function getAll(): Promise<GetAllModules[] | null> {
   const modules: GetAllModules[] | null = await prisma.module.findMany({
+    orderBy: { createdAt: "asc" },
     select: { id: true, name: true, description: true, imageUrl: true, isEnabled: true, createdAt: true },
   });
 
