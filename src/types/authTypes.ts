@@ -8,6 +8,7 @@ export type SignInUser = Omit<SignUpUser, "name">;
 
 export interface UserToken {
   token: string;
+  isAdmin: boolean;
 }
 
 export interface JWTPayload {

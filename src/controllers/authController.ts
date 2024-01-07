@@ -9,7 +9,7 @@ export async function signUp(req: Request, res: Response) {
 }
 
 export async function signIn(req: Request, res: Response) {
-  const token = await authService.signIn(req.body as SignInUser);
+  const response = await authService.signIn(req.body as SignInUser);
 
-  res.status(200).send(token);
+  res.status(200).send(response);
 }

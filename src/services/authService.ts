@@ -55,7 +55,7 @@ export async function signUp(user: SignUpUser) {
 }
 
 export async function signIn(user: SignInUser): Promise<UserToken> {
-  const { id } = await validateEmailAndPassword(user);
+  const { id, isAdmin } = await validateEmailAndPassword(user);
 
-  return { token: generateToken(id) };
+  return { token: generateToken(id), isAdmin };
 }
