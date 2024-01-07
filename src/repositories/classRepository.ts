@@ -1,6 +1,6 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { prisma } from "../config/prisma";
-import { ClassPayload, TClass } from "../types/classTypes";
+import { ClassPayload, GetAllClasses, TClass } from "../types/classTypes";
 import { DefaultArgs } from "@prisma/client/runtime/library";
 
 export async function findOneByNameAndModuleId(_class: ClassPayload): Promise<TClass | null> {
@@ -38,4 +38,14 @@ export async function insertOne(
       },
     },
   });
+}
+
+export async function getAll(moduleId: string): Promise<GetAllClasses[] | null> {
+  const classes: GetAllClasses[] | null = await prisma.class.findMany({
+    where: { moduleId },
+    orderBy: { createdAt: "asc" },
+    select: { id: true, name: true, imageUrl: true, isEnabled: true, moduleId: true, dueDate: true },
+  });
+
+  return classes;
 }

@@ -7,6 +7,7 @@ import * as classController from "../controllers/classController";
 
 const classRouter: Router = Router();
 
+classRouter.get("/:moduleId", classController.getAll);
 classRouter.use(validateAdmin);
 classRouter.post("/", validateSchema(classSchema), classController.create);
 

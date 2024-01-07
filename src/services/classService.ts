@@ -1,14 +1,14 @@
 import moment from "moment";
 
-import { ClassPayload } from "../types/classTypes";
+import { ClassPayload, GetAllClasses } from "../types/classTypes";
 import * as moduleRepository from "../repositories/moduleRepository";
 import * as classRepository from "../repositories/classRepository";
 import * as videoService from "./videoService";
 import * as summaryService from "./summaryService";
 import * as errorHandling from "../errors/errorHandling";
 
-async function validateModuleId(_class: ClassPayload) {
-  const module = await moduleRepository.findOneById(_class.moduleId);
+async function validateModuleId(moduleId: string) {
+  const module = await moduleRepository.findOneById(moduleId);
 
   if (!module) {
     throw errorHandling.notFound("There is no module with the given ID.");
@@ -33,7 +33,7 @@ export async function validateDueDate(_class: ClassPayload) {
 }
 
 export async function validateClass(_class: ClassPayload) {
-  await validateModuleId(_class);
+  await validateModuleId(_class.moduleId);
 
   await validateClassNameConflictInModule(_class);
 
@@ -48,4 +48,12 @@ export async function create(_class: ClassPayload) {
   await summaryService.validateSummary(_class.summaryUrl);
 
   await classRepository.insertOne(_class);
+}
+
+export async function getAll(moduleId: string): Promise<GetAllClasses[] | null> {
+  await validateModuleId(moduleId);
+
+  const classes = await classRepository.getAll(moduleId);
+
+  return classes;
 }

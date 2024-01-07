@@ -8,3 +8,5 @@ export type ClassPayload = Omit<Class, "id" | "isEnabled" | "createdAt" | "updat
 };
 
 export type ClassWithoutModuleId = Omit<ClassPayload, "moduleId">;
+
+export type GetAllClasses = Omit<Class, "createdAt" | "updatedAt">;
