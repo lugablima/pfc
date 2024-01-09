@@ -12,5 +12,6 @@ classRouter.use(validateAdmin);
 classRouter.post("/", validateSchema(classSchema), classController.create);
 classRouter.put("/:classId/enable", classController.enable);
 classRouter.put("/:classId/disable", classController.disable);
+classRouter.delete("/:classId", classController.deleteOne);
 
 export default classRouter;

@@ -74,3 +74,10 @@ export async function updateOneIsEnabled(moduleId: string, isEnabled: boolean): 
 
   return classUpdated;
 }
+
+export async function deleteOne(moduleId: string): Promise<void> {
+  await prisma.class.delete({
+    where: { id: moduleId },
+    include: { exercises: true, summary: true, video: true },
+  });
+}

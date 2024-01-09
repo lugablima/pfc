@@ -25,3 +25,9 @@ export async function disable(req: Request, res: Response) {
 
   res.status(200).send("Class disabled successfully!");
 }
+
+export async function deleteOne(req: Request, res: Response) {
+  await classService.deleteOne(req.params.classId);
+
+  res.status(200).send("Class deleted successfully!");
+}
