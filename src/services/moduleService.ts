@@ -32,6 +32,15 @@ export async function validateClass(_class: ClassPayload) {
   await classService.validateDueDate(_class);
 }
 
+async function validateIfModuleIsEnabledOrDisabled(moduleId: string, isEnabledTarget: boolean) {
+  const module = await moduleRepository.findOneByIdAndIsEnabled(moduleId, isEnabledTarget);
+  const enabledOrDisabled = isEnabledTarget ? "enabled" : "disabled";
+
+  if (module) {
+    throw errorHandling.conflict(`Module is already ${enabledOrDisabled}`);
+  }
+}
+
 export async function create(module: ModulePayload) {
   await validateModuleNameConflict(module);
 
@@ -65,4 +74,12 @@ export async function getAll(): Promise<GetAllModules[] | null> {
   const modules = await moduleRepository.getAll();
 
   return modules;
+}
+
+export async function enableOrDisable(moduleId: string, isEnabledTarget: boolean): Promise<void> {
+  await classService.validateModuleId(moduleId);
+
+  await validateIfModuleIsEnabledOrDisabled(moduleId, isEnabledTarget);
+
+  await moduleRepository.updateOneIsEnabled(moduleId, isEnabledTarget);
 }

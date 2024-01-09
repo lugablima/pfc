@@ -13,3 +13,15 @@ export async function getAll(req: Request, res: Response) {
 
   res.status(200).send(modules);
 }
+
+export async function enable(req: Request, res: Response) {
+  await moduleService.enableOrDisable(req.params.moduleId, true);
+
+  res.status(200).send("Module enabled successfully!");
+}
+
+export async function disable(req: Request, res: Response) {
+  await moduleService.enableOrDisable(req.params.moduleId, false);
+
+  res.status(200).send("Module disabled successfully!");
+}

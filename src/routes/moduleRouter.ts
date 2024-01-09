@@ -9,5 +9,7 @@ const moduleRouter: Router = Router();
 moduleRouter.get("/", moduleController.getAll);
 moduleRouter.use(validateAdmin);
 moduleRouter.post("/", validateSchema(moduleSchema), moduleController.create);
+moduleRouter.put("/:moduleId/enable", moduleController.enable);
+moduleRouter.put("/:moduleId/disable", moduleController.disable);
 
 export default moduleRouter;

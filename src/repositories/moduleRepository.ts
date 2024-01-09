@@ -27,3 +27,20 @@ export async function insertOne(module: CreateModule): Promise<TModule> {
 
   return createdModule;
 }
+
+export async function updateOneIsEnabled(moduleId: string, isEnabled: boolean): Promise<TModule> {
+  const moduleUpdated = await prisma.module.update({
+    where: { id: moduleId },
+    data: { isEnabled },
+  });
+
+  return moduleUpdated;
+}
+
+export async function findOneByIdAndIsEnabled(moduleId: string, isEnabled: boolean): Promise<TModule | null> {
+  const module = await prisma.module.findUnique({
+    where: { id: moduleId, AND: { isEnabled } },
+  });
+
+  return module;
+}
