@@ -49,3 +49,28 @@ export async function getAll(moduleId: string): Promise<GetAllClasses[] | null> 
 
   return classes;
 }
+
+export async function findOneById(classId: string): Promise<GetAllClasses | null> {
+  const classFounded = await prisma.class.findUnique({
+    where: { id: classId },
+  });
+
+  return classFounded;
+}
+
+export async function findOneByIdAndIsEnabled(classId: string, isEnabled: boolean): Promise<GetAllClasses | null> {
+  const classFounded = await prisma.class.findUnique({
+    where: { id: classId, AND: { isEnabled } },
+  });
+
+  return classFounded;
+}
+
+export async function updateOneIsEnabled(moduleId: string, isEnabled: boolean): Promise<GetAllClasses> {
+  const classUpdated = await prisma.class.update({
+    where: { id: moduleId },
+    data: { isEnabled },
+  });
+
+  return classUpdated;
+}

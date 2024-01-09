@@ -10,5 +10,7 @@ const classRouter: Router = Router();
 classRouter.get("/:moduleId", classController.getAll);
 classRouter.use(validateAdmin);
 classRouter.post("/", validateSchema(classSchema), classController.create);
+classRouter.put("/:classId/enable", classController.enable);
+classRouter.put("/:classId/disable", classController.disable);
 
 export default classRouter;

@@ -13,3 +13,15 @@ export async function getAll(req: Request, res: Response) {
 
   res.status(200).send(classes);
 }
+
+export async function enable(req: Request, res: Response) {
+  await classService.enableOrDisable(req.params.classId, true);
+
+  res.status(200).send("Class enabled successfully!");
+}
+
+export async function disable(req: Request, res: Response) {
+  await classService.enableOrDisable(req.params.classId, false);
+
+  res.status(200).send("Class disabled successfully!");
+}

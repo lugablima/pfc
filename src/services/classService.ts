@@ -7,7 +7,7 @@ import * as videoService from "./videoService";
 import * as summaryService from "./summaryService";
 import * as errorHandling from "../errors/errorHandling";
 
-async function validateModuleId(moduleId: string) {
+export async function validateModuleId(moduleId: string) {
   const module = await moduleRepository.findOneById(moduleId);
 
   if (!module) {
@@ -40,6 +40,23 @@ export async function validateClass(_class: ClassPayload) {
   await validateDueDate(_class);
 }
 
+export async function validateClassId(classId: string) {
+  const classFounded = await classRepository.findOneById(classId);
+
+  if (!classFounded) {
+    throw errorHandling.notFound("There is no class with the given ID.");
+  }
+}
+
+async function validateIfClassIsEnabledOrDisabled(classId: string, isEnabledTarget: boolean) {
+  const classFounded = await classRepository.findOneByIdAndIsEnabled(classId, isEnabledTarget);
+  const enabledOrDisabled = isEnabledTarget ? "enabled" : "disabled";
+
+  if (classFounded) {
+    throw errorHandling.conflict(`Class is already ${enabledOrDisabled}`);
+  }
+}
+
 export async function create(_class: ClassPayload) {
   await validateClass(_class);
 
@@ -56,4 +73,12 @@ export async function getAll(moduleId: string): Promise<GetAllClasses[] | null> 
   const classes = await classRepository.getAll(moduleId);
 
   return classes;
+}
+
+export async function enableOrDisable(classId: string, isEnabledTarget: boolean): Promise<void> {
+  await validateClassId(classId);
+
+  await validateIfClassIsEnabledOrDisabled(classId, isEnabledTarget);
+
+  await classRepository.updateOneIsEnabled(classId, isEnabledTarget);
 }
