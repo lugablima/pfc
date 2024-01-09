@@ -25,3 +25,9 @@ export async function disable(req: Request, res: Response) {
 
   res.status(200).send("Module disabled successfully!");
 }
+
+export async function deleteOne(req: Request, res: Response) {
+  await moduleService.deleteOne(req.params.moduleId);
+
+  res.status(200).send("Module deleted successfully!");
+}

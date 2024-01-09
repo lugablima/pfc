@@ -44,3 +44,10 @@ export async function findOneByIdAndIsEnabled(moduleId: string, isEnabled: boole
 
   return module;
 }
+
+export async function deleteOne(moduleId: string): Promise<void> {
+  await prisma.module.delete({
+    where: { id: moduleId },
+    include: { classes: { where: { moduleId } } },
+  });
+}

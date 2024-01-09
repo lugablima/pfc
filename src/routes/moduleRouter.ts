@@ -11,5 +11,6 @@ moduleRouter.use(validateAdmin);
 moduleRouter.post("/", validateSchema(moduleSchema), moduleController.create);
 moduleRouter.put("/:moduleId/enable", moduleController.enable);
 moduleRouter.put("/:moduleId/disable", moduleController.disable);
+moduleRouter.delete("/:moduleId", moduleController.deleteOne);
 
 export default moduleRouter;

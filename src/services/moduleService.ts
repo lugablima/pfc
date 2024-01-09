@@ -83,3 +83,9 @@ export async function enableOrDisable(moduleId: string, isEnabledTarget: boolean
 
   await moduleRepository.updateOneIsEnabled(moduleId, isEnabledTarget);
 }
+
+export async function deleteOne(moduleId: string): Promise<void> {
+  await classService.validateModuleId(moduleId);
+
+  await moduleRepository.deleteOne(moduleId);
+}
