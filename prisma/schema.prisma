@@ -48,7 +48,7 @@ model Class {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  module    Module     @relation(fields: [moduleId], references: [id])
+  module    Module     @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   video     Video?
   summary   Summary?
   exercises Exercise[]
@@ -64,7 +64,7 @@ model Video {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  class Class @relation(fields: [classId], references: [id])
+  class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
 
   @@map("videos")
 }
@@ -76,7 +76,7 @@ model Summary {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  class Class @relation(fields: [classId], references: [id])
+  class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
 
   @@map("summaries")
 }
@@ -90,7 +90,7 @@ model Exercise {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  class       Class        @relation(fields: [classId], references: [id])
+  class       Class        @relation(fields: [classId], references: [id], onDelete: Cascade)
   test        Test?
   resolutions Resolution[]
 
