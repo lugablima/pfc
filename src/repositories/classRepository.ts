@@ -1,12 +1,20 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { prisma } from "../config/prisma";
-import { ClassPayload, GetAllClasses, TClass } from "../types/classTypes";
+import { ClassPayload, EditClassPayload, GetAllClasses, TClass } from "../types/classTypes";
 import { DefaultArgs } from "@prisma/client/runtime/library";
 
-export async function findOneByNameAndModuleId(_class: ClassPayload): Promise<TClass | null> {
-  const registeredClass: TClass | null = await prisma.class.findUnique({
-    where: { name_moduleId: { name: _class.name, moduleId: _class.moduleId } },
-  });
+export async function findOneByNameAndModuleId(_class: ClassPayload, distinctId?: string): Promise<TClass | null> {
+  let registeredClass: TClass | null;
+
+  if (distinctId) {
+    registeredClass = await prisma.class.findUnique({
+      where: { name_moduleId: { name: _class.name, moduleId: _class.moduleId }, AND: { id: { not: distinctId } } },
+    });
+  } else {
+    registeredClass = await prisma.class.findUnique({
+      where: { name_moduleId: { name: _class.name, moduleId: _class.moduleId } },
+    });
+  }
 
   return registeredClass;
 }
@@ -73,6 +81,45 @@ export async function updateOneIsEnabled(moduleId: string, isEnabled: boolean): 
   });
 
   return classUpdated;
+}
+
+export async function updateOne(
+  _class: EditClassPayload,
+  prismaTransaction?: Omit<
+    PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
+    "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
+  >,
+): Promise<void> {
+  const db = prismaTransaction || prisma;
+
+  await db.class.update({
+    where: { id: _class.id },
+    data: {
+      name: _class.name,
+      imageUrl: _class.imageUrl,
+      dueDate: _class.dueDate,
+      video: {
+        upsert: {
+          update: {
+            url: _class.videoUrl,
+          },
+          create: {
+            url: _class.videoUrl,
+          },
+        },
+      },
+      summary: {
+        upsert: {
+          create: {
+            url: _class.summaryUrl,
+          },
+          update: {
+            url: _class.summaryUrl,
+          },
+        },
+      },
+    },
+  });
 }
 
 export async function deleteOne(moduleId: string): Promise<void> {

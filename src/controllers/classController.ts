@@ -8,6 +8,12 @@ export async function create(req: Request, res: Response) {
   res.status(201).send("Class created successfully!");
 }
 
+export async function edit(req: Request, res: Response) {
+  await classService.edit(req.body as ClassPayload, req.params.classId);
+
+  res.status(200).send("Class edited successfully!");
+}
+
 export async function getAll(req: Request, res: Response) {
   const classes = await classService.getAll(req.params.moduleId);
 

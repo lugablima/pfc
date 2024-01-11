@@ -1,7 +1,7 @@
 import joi from "joi";
 import { ClassPayload } from "../types/classTypes";
 
-const classSchema = joi.object<ClassPayload>({
+export const classSchema = joi.object<ClassPayload>({
   name: joi.string().trim().required(),
   imageUrl: joi.string().uri().required(),
   videoUrl: joi.string().uri().required(),
@@ -10,4 +10,11 @@ const classSchema = joi.object<ClassPayload>({
   dueDate: joi.date().iso().required(),
 });
 
-export default classSchema;
+export const editClassSchemaWithoutId = joi.object<ClassPayload>({
+  name: joi.string().trim(),
+  imageUrl: joi.string().uri(),
+  videoUrl: joi.string().uri(),
+  summaryUrl: joi.string().uri(),
+  moduleId: joi.string().trim().required(),
+  dueDate: joi.date().iso(),
+});

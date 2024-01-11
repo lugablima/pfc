@@ -1,10 +1,8 @@
 import moment from "moment";
 
-import { ClassPayload, GetAllClasses } from "../types/classTypes";
+import { ClassPayload, GetAllClasses, TClass } from "../types/classTypes";
 import * as moduleRepository from "../repositories/moduleRepository";
 import * as classRepository from "../repositories/classRepository";
-import * as videoService from "./videoService";
-import * as summaryService from "./summaryService";
 import * as errorHandling from "../errors/errorHandling";
 
 export async function validateModuleId(moduleId: string) {
@@ -15,8 +13,16 @@ export async function validateModuleId(moduleId: string) {
   }
 }
 
-async function validateClassNameConflictInModule(_class: ClassPayload) {
-  const registeredClass = await classRepository.findOneByNameAndModuleId(_class);
+async function validateClassNameConflictInModule(_class: ClassPayload, distintictId?: string) {
+  if (!_class.name) return;
+
+  let registeredClass: TClass | null;
+
+  if (distintictId) {
+    registeredClass = await classRepository.findOneByNameAndModuleId(_class, distintictId);
+  } else {
+    registeredClass = await classRepository.findOneByNameAndModuleId(_class);
+  }
 
   if (registeredClass) {
     throw errorHandling.conflict(`The class '${registeredClass.name}' already exists in this module.`);
@@ -24,6 +30,8 @@ async function validateClassNameConflictInModule(_class: ClassPayload) {
 }
 
 export async function validateDueDate(_class: ClassPayload) {
+  if (!_class.dueDate) return;
+
   const dueDate = moment.utc(_class.dueDate);
   const now = moment.utc();
 
@@ -60,11 +68,15 @@ async function validateIfClassIsEnabledOrDisabled(classId: string, isEnabledTarg
 export async function create(_class: ClassPayload) {
   await validateClass(_class);
 
-  await videoService.validateVideo(_class.videoUrl);
-
-  await summaryService.validateSummary(_class.summaryUrl);
-
   await classRepository.insertOne(_class);
+}
+
+export async function edit(_class: ClassPayload, classId: string) {
+  await validateClassId(classId);
+
+  await validateClass(_class);
+
+  await classRepository.updateOne({ ..._class, id: classId, dueDate: moment.parseZone(_class.dueDate).toDate() });
 }
 
 export async function getAll(moduleId: string): Promise<GetAllClasses[] | null> {
