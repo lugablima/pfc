@@ -59,7 +59,7 @@ model Class {
 
 model Video {
   id        String   @id @default(uuid())
-  url       String   @unique
+  url       String
   classId   String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -71,7 +71,7 @@ model Video {
 
 model Summary {
   id        String   @id @default(uuid())
-  url       String   @unique
+  url       String
   classId   String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
