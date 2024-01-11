@@ -13,7 +13,7 @@ export async function validateModuleId(moduleId: string) {
   }
 }
 
-async function validateClassNameConflictInModule(_class: ClassPayload, distintictId?: string) {
+export async function validateClassNameConflictInModule(_class: ClassPayload, distintictId?: string) {
   if (!_class.name) return;
 
   let registeredClass: TClass | null;

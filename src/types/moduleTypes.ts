@@ -1,5 +1,5 @@
 import { Module } from "@prisma/client";
-import { ClassPayload } from "./classTypes";
+import { ClassPayload, EditClassPayload } from "./classTypes";
 
 export type TModule = Module;
 
@@ -7,6 +7,10 @@ export type CreateModule = Omit<Module, "id" | "isEnabled" | "createdAt" | "upda
 
 export type ModulePayload = CreateModule & {
   classes: Omit<ClassPayload, "moduleId">[];
+};
+
+export type EditModulePayload = Partial<CreateModule> & {
+  classes?: Omit<EditClassPayload, "moduleId">[];
 };
 
 export type GetAllModules = Omit<Module, "createdAt" | "updatedAt">;

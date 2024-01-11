@@ -66,6 +66,14 @@ export async function findOneById(classId: string): Promise<GetAllClasses | null
   return classFounded;
 }
 
+export async function findOneByIdAndModuleId(classId: string, moduleId: string): Promise<GetAllClasses | null> {
+  const classFounded = await prisma.class.findUnique({
+    where: { id: classId, AND: { moduleId } },
+  });
+
+  return classFounded;
+}
+
 export async function findOneByIdAndIsEnabled(classId: string, isEnabled: boolean): Promise<GetAllClasses | null> {
   const classFounded = await prisma.class.findUnique({
     where: { id: classId, AND: { isEnabled } },

@@ -1,11 +1,17 @@
 import { Request, Response } from "express";
-import { ModulePayload } from "../types/moduleTypes";
+import { EditModulePayload, ModulePayload } from "../types/moduleTypes";
 import * as moduleService from "../services/moduleService";
 
 export async function create(req: Request, res: Response) {
   await moduleService.create(req.body as ModulePayload);
 
   res.status(201).send("Module created successfully!");
+}
+
+export async function edit(req: Request, res: Response) {
+  await moduleService.edit(req.body as EditModulePayload, req.params.moduleId);
+
+  res.status(200).send("Module edited successfully!");
 }
 
 export async function getAll(req: Request, res: Response) {

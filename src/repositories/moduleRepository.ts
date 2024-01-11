@@ -7,8 +7,20 @@ export async function findOneById(id: string): Promise<TModule | null> {
   return module;
 }
 
-export async function findOneByName(name: string): Promise<TModule | null> {
-  const module: TModule | null = await prisma.module.findUnique({ where: { name } });
+export async function findOneByName(name: string, distinctId?: string): Promise<TModule | null> {
+  let module: TModule | null;
+
+  if (distinctId) {
+    module = await prisma.module.findUnique({
+      where: { name, AND: { id: { not: distinctId } } },
+    });
+
+    return module;
+  }
+
+  module = await prisma.module.findUnique({
+    where: { name },
+  });
 
   return module;
 }
