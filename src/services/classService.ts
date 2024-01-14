@@ -68,7 +68,7 @@ async function validateIfClassIsEnabledOrDisabled(classId: string, isEnabledTarg
 export async function create(_class: ClassPayload) {
   await validateClass(_class);
 
-  await classRepository.insertOne(_class);
+  await classRepository.insertOne({ ..._class, dueDate: moment.parseZone(_class.dueDate).toDate() });
 }
 
 export async function edit(_class: ClassPayload, classId: string) {
