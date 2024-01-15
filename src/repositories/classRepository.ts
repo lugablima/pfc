@@ -52,7 +52,15 @@ export async function getAll(moduleId: string): Promise<GetAllClasses[] | null> 
   const classes: GetAllClasses[] | null = await prisma.class.findMany({
     where: { moduleId },
     orderBy: { createdAt: "asc" },
-    select: { id: true, name: true, imageUrl: true, isEnabled: true, moduleId: true, dueDate: true },
+    select: {
+      id: true,
+      name: true,
+      imageUrl: true,
+      isEnabled: true,
+      moduleId: true,
+      dueDate: true,
+      module: { select: { name: true } },
+    },
   });
 
   return classes;
