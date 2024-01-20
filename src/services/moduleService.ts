@@ -1,11 +1,17 @@
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-await-in-loop */
 import { EditModulePayload, GetAllModules, ModulePayload, TModule } from "../types/moduleTypes";
 import * as moduleRepository from "../repositories/moduleRepository";
 import * as classRepository from "../repositories/classRepository";
+import * as exerciseRepository from "../repositories/exerciseRepository";
+import * as testRepository from "../repositories/testRepository";
 import * as errorHandling from "../errors/errorHandling";
 import * as classService from "./classService";
+import * as exerciseService from "./exerciseService";
 import { prisma } from "../config/prisma";
 import { ClassPayload } from "../types/classTypes";
 import * as moment from "moment";
+import { IEditExerciseFileContent, IExerciseFileContent } from "../types/exerciseTypes";
 
 async function validateModuleNameConflict(module: ModulePayload, moduleId?: string) {
   let registeredModule: TModule | null;
@@ -67,13 +73,23 @@ export async function create(module: ModulePayload) {
       },
     });
 
-    // eslint-disable-next-line no-restricted-syntax
     for (const _class of module.classes) {
-      // eslint-disable-next-line no-await-in-loop
       await validateClass({ ..._class, moduleId });
 
-      // eslint-disable-next-line no-await-in-loop
-      await classRepository.insertOne({ ..._class, moduleId, dueDate: moment.parseZone(_class.dueDate).toDate() }, tx);
+      exerciseService.validateExerciseContent(_class.exerciseFile.content);
+
+      const { id: classId } = await classRepository.insertOne(
+        { ..._class, moduleId, dueDate: moment.parseZone(_class.dueDate).toDate() },
+        tx,
+      );
+
+      const contentParsed: IExerciseFileContent = JSON.parse(_class.exerciseFile.content);
+
+      for (const [idx, exercise] of Object.entries(contentParsed.exercises)) {
+        const { id: exerciseId } = await exerciseRepository.createOne(exercise, Number(idx) + 1, classId, tx);
+
+        await testRepository.createMany(exercise.tests, exerciseId, tx);
+      }
     }
   });
 }
@@ -101,15 +117,11 @@ export async function edit(module: EditModulePayload, moduleId: string) {
 
     if (!module.classes) return;
 
-    // eslint-disable-next-line no-restricted-syntax
     for (const _class of module.classes) {
-      // eslint-disable-next-line no-await-in-loop
       await validateClass({ ..._class, moduleId });
 
-      // eslint-disable-next-line no-await-in-loop
       await validateClassId(_class.id, moduleId);
 
-      // eslint-disable-next-line no-await-in-loop
       await classService.validateClassNameConflictInModule(
         {
           name: _class.name,
@@ -118,12 +130,27 @@ export async function edit(module: EditModulePayload, moduleId: string) {
           moduleId,
           summaryUrl: _class.summaryUrl,
           videoUrl: _class.videoUrl,
+          exerciseFile: _class.exerciseFile,
         },
         _class.id,
       );
 
-      // eslint-disable-next-line no-await-in-loop
-      await classRepository.updateOne({ ..._class, moduleId, dueDate: moment.parseZone(_class.dueDate).toDate() }, tx);
+      exerciseService.validateExerciseContent(_class.exerciseFile.content);
+
+      const { id: classId } = await classRepository.updateOne(
+        { ..._class, moduleId, dueDate: moment.parseZone(_class.dueDate).toDate() },
+        tx,
+      );
+
+      const contentParsed: IEditExerciseFileContent = JSON.parse(_class.exerciseFile.content);
+
+      for (const exercise of contentParsed.exercises) {
+        const { id: exerciseId } = await exerciseRepository.updateOne(exercise, classId, tx);
+
+        for (const test of exercise.tests) {
+          await testRepository.updateOne(test, exerciseId, tx);
+        }
+      }
     }
   });
 }
