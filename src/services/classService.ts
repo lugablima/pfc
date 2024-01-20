@@ -87,6 +87,14 @@ export async function getAll(moduleId: string): Promise<GetAllClasses[] | null> 
   return classes;
 }
 
+export async function getClassInfoForEdit(classId: string) {
+  await validateClassId(classId);
+
+  const _class = await classRepository.getClassInfoForEdit(classId);
+
+  return _class;
+}
+
 export async function enableOrDisable(classId: string, isEnabledTarget: boolean): Promise<void> {
   await validateClassId(classId);
 

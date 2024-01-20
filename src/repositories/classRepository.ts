@@ -66,6 +66,31 @@ export async function getAll(moduleId: string): Promise<GetAllClasses[] | null> 
   return classes;
 }
 
+export async function getClassInfoForEdit(classId: string) {
+  const _class = await prisma.class.findUnique({
+    where: { id: classId },
+    select: {
+      id: true,
+      name: true,
+      imageUrl: true,
+      dueDate: true,
+      video: { select: { url: true } },
+      summary: { select: { url: true } },
+      exercises: {
+        orderBy: { sequence: "asc" },
+        select: {
+          id: true,
+          name: true,
+          statement: true,
+          tests: { orderBy: { createdAt: "asc" }, select: { id: true, inputs: true, result: true } },
+        },
+      },
+    },
+  });
+
+  return _class;
+}
+
 export async function findOneById(classId: string): Promise<GetAllClasses | null> {
   const classFounded = await prisma.class.findUnique({
     where: { id: classId },

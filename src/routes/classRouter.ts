@@ -8,6 +8,7 @@ import * as classController from "../controllers/classController";
 const classRouter: Router = Router();
 
 classRouter.get("/:moduleId", classController.getAll);
+classRouter.get("/:classId/edit", classController.getClassInfoForEdit);
 classRouter.use(validateAdmin);
 classRouter.post("/", validateSchema(classSchema), classController.create);
 classRouter.put("/:classId", validateSchema(editClassSchemaWithoutId), classController.edit);
