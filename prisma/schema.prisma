@@ -101,8 +101,7 @@ model Exercise {
 
 model Test {
   id         String   @id @default(uuid())
-  exerciseId String   @unique
-  tests      Json
+  exerciseId String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
