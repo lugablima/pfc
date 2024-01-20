@@ -34,6 +34,40 @@ export async function getAll(): Promise<GetAllModules[] | null> {
   return modules;
 }
 
+export async function getModuleInfoForEdit(moduleId: string) {
+  const module = await prisma.module.findUnique({
+    where: { id: moduleId },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      imageUrl: true,
+      classes: {
+        orderBy: { createdAt: "asc" },
+        select: {
+          id: true,
+          name: true,
+          imageUrl: true,
+          dueDate: true,
+          video: { select: { url: true } },
+          summary: { select: { url: true } },
+          exercises: {
+            orderBy: { sequence: "asc" },
+            select: {
+              id: true,
+              name: true,
+              statement: true,
+              tests: { orderBy: { createdAt: "asc" }, select: { id: true, inputs: true, result: true } },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return module;
+}
+
 export async function insertOne(module: CreateModule): Promise<TModule> {
   const createdModule = await prisma.module.create({ data: { ...module } });
 

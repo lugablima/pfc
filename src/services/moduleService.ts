@@ -134,6 +134,14 @@ export async function getAll(): Promise<GetAllModules[] | null> {
   return modules;
 }
 
+export async function getModuleInfoForEdit(moduleId: string) {
+  await classService.validateModuleId(moduleId);
+
+  const module = await moduleRepository.getModuleInfoForEdit(moduleId);
+
+  return module;
+}
+
 export async function enableOrDisable(moduleId: string, isEnabledTarget: boolean): Promise<void> {
   await classService.validateModuleId(moduleId);
 

@@ -20,6 +20,12 @@ export async function getAll(req: Request, res: Response) {
   res.status(200).send(modules);
 }
 
+export async function getModuleInfoForEdit(req: Request, res: Response) {
+  const module = await moduleService.getModuleInfoForEdit(req.params.moduleId);
+
+  res.status(200).send(module);
+}
+
 export async function enable(req: Request, res: Response) {
   await moduleService.enableOrDisable(req.params.moduleId, true);
 

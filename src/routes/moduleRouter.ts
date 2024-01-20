@@ -7,6 +7,7 @@ import * as moduleController from "../controllers/moduleController";
 const moduleRouter: Router = Router();
 
 moduleRouter.get("/", moduleController.getAll);
+moduleRouter.get("/:moduleId", moduleController.getModuleInfoForEdit);
 moduleRouter.use(validateAdmin);
 moduleRouter.post("/", validateSchema(createModuleSchema), moduleController.create);
 moduleRouter.put("/:moduleId", validateSchema(editModuleSchema), moduleController.edit);
