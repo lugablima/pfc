@@ -1,9 +1,16 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
 import moment from "moment";
 
 import { ClassPayload, GetAllClasses, TClass } from "../types/classTypes";
+import * as exerciseService from "./exerciseService";
 import * as moduleRepository from "../repositories/moduleRepository";
 import * as classRepository from "../repositories/classRepository";
+import * as exerciseRepository from "../repositories/exerciseRepository";
+import * as testRepository from "../repositories/testRepository";
 import * as errorHandling from "../errors/errorHandling";
+import { IEditExerciseFileContent, IExerciseFileContent } from "../types/exerciseTypes";
+import { prisma } from "../config/prisma";
 
 export async function validateModuleId(moduleId: string) {
   const module = await moduleRepository.findOneById(moduleId);
@@ -40,10 +47,10 @@ export async function validateDueDate(_class: ClassPayload) {
   }
 }
 
-export async function validateClass(_class: ClassPayload) {
+export async function validateClass(_class: ClassPayload, distintictId?: string) {
   await validateModuleId(_class.moduleId);
 
-  await validateClassNameConflictInModule(_class);
+  await validateClassNameConflictInModule(_class, distintictId);
 
   await validateDueDate(_class);
 }
@@ -68,15 +75,47 @@ async function validateIfClassIsEnabledOrDisabled(classId: string, isEnabledTarg
 export async function create(_class: ClassPayload) {
   await validateClass(_class);
 
-  await classRepository.insertOne({ ..._class, dueDate: moment.parseZone(_class.dueDate).toDate() });
+  exerciseService.validateExerciseContent(_class.exerciseFile.content);
+
+  await prisma.$transaction(async (tx) => {
+    const { id: classId } = await classRepository.insertOne(
+      {
+        ..._class,
+        dueDate: moment.parseZone(_class.dueDate).toDate(),
+      },
+      tx,
+    );
+
+    const contentParsed: IExerciseFileContent = JSON.parse(_class.exerciseFile.content);
+
+    for (const [idx, exercise] of Object.entries(contentParsed.exercises)) {
+      const { id: exerciseId } = await exerciseRepository.createOne(exercise, Number(idx) + 1, classId, tx);
+
+      await testRepository.createMany(exercise.tests, exerciseId, tx);
+    }
+  });
 }
 
 export async function edit(_class: ClassPayload, classId: string) {
   await validateClassId(classId);
 
-  await validateClass(_class);
+  await validateClass(_class, classId);
 
-  await classRepository.updateOne({ ..._class, id: classId, dueDate: moment.parseZone(_class.dueDate).toDate() });
+  exerciseService.validateExerciseContent(_class.exerciseFile.content);
+
+  await prisma.$transaction(async (tx) => {
+    await classRepository.updateOne({ ..._class, id: classId, dueDate: moment.parseZone(_class.dueDate).toDate() }, tx);
+
+    const contentParsed: IEditExerciseFileContent = JSON.parse(_class.exerciseFile.content);
+
+    for (const exercise of contentParsed.exercises) {
+      const { id: exerciseId } = await exerciseRepository.updateOne(exercise, classId, tx);
+
+      for (const test of exercise.tests) {
+        await testRepository.updateOne(test, exerciseId, tx);
+      }
+    }
+  });
 }
 
 export async function getAll(moduleId: string): Promise<GetAllClasses[] | null> {

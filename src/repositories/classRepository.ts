@@ -25,10 +25,10 @@ export async function insertOne(
     PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
     "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
   >,
-): Promise<void> {
+) {
   const db = prismaTransaction || prisma;
 
-  await db.class.create({
+  const res = await db.class.create({
     data: {
       name: _class.name,
       imageUrl: _class.imageUrl,
@@ -46,6 +46,8 @@ export async function insertOne(
       },
     },
   });
+
+  return res;
 }
 
 export async function getAll(moduleId: string): Promise<GetAllClasses[] | null> {
@@ -130,10 +132,10 @@ export async function updateOne(
     PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
     "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
   >,
-): Promise<void> {
+) {
   const db = prismaTransaction || prisma;
 
-  await db.class.update({
+  const res = await db.class.update({
     where: { id: _class.id },
     data: {
       name: _class.name,
@@ -161,6 +163,8 @@ export async function updateOne(
       },
     },
   });
+
+  return res;
 }
 
 export async function deleteOne(moduleId: string): Promise<void> {
