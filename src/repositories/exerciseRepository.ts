@@ -47,3 +47,11 @@ export async function updateOne(
 
   return res;
 }
+
+export async function getOneById(exerciseId: string) {
+  const exercise = await prisma.exercise.findUnique({
+    where: { id: exerciseId },
+  });
+
+  return exercise;
+}
