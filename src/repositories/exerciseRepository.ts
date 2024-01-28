@@ -72,6 +72,7 @@ export async function getAllByClassIdAndUserId(classId: string, userId: string) 
 export async function getOneById(exerciseId: string) {
   const exercise = await prisma.exercise.findUnique({
     where: { id: exerciseId },
+    select: { id: true, class: { select: { id: true, dueDate: true } } },
   });
 
   return exercise;

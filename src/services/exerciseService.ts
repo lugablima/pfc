@@ -1,3 +1,5 @@
+import moment from "moment";
+
 import { IExerciseFileContent } from "../types/exerciseTypes";
 import * as errorHandling from "../errors/errorHandling";
 import * as exerciseRepository from "../repositories/exerciseRepository";
@@ -52,10 +54,23 @@ export async function validateExerciseId(exerciseId: string) {
   if (!exercise) {
     throw errorHandling.notFound("Exercise id not found");
   }
+
+  return exercise;
+}
+
+export function validateClassDueDate(rawDueDate: Date) {
+  const dueDate = moment.utc(rawDueDate);
+  const now = moment.utc();
+
+  if (dueDate.isSameOrBefore(now)) {
+    throw errorHandling.badRequest("The due date for the exercise has passed.");
+  }
 }
 
 export async function createResolution(userId: string, exerciseId: string, body: TCreateResolutionPayload) {
-  await validateExerciseId(exerciseId);
+  const exercise = await validateExerciseId(exerciseId);
+
+  validateClassDueDate(exercise.class.dueDate);
 
   await resolutionRepository.createOrUpdateOne(userId, exerciseId, body);
 }
