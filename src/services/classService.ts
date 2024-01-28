@@ -134,6 +134,14 @@ export async function getClassInfoForEdit(classId: string) {
   return _class;
 }
 
+export async function getAllExercises(classId: string, userId: string) {
+  await validateClassId(classId);
+
+  const exercises = await exerciseRepository.getAllByClassIdAndUserId(classId, userId);
+
+  return exercises;
+}
+
 export async function enableOrDisable(classId: string, isEnabledTarget: boolean): Promise<void> {
   await validateClassId(classId);
 

@@ -26,6 +26,12 @@ export async function getClassInfoForEdit(req: Request, res: Response) {
   res.status(200).send(_class);
 }
 
+export async function getAllExercises(req: Request, res: Response) {
+  const exercises = await classService.getAllExercises(req.params.classId, res.locals.userId);
+
+  res.status(200).send(exercises);
+}
+
 export async function enable(req: Request, res: Response) {
   await classService.enableOrDisable(req.params.classId, true);
 

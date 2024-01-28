@@ -14,7 +14,13 @@ export async function createMany(
   const db = prismaTransaction || prisma;
 
   const res = await db.test.createMany({
-    data: tests.map((t) => ({ exerciseId, inputs: t.inputs, result: t.result })),
+    data: tests.map((t) => ({
+      exerciseId,
+      inputs: t.inputs,
+      result: t.result,
+      inputDataType: t.inputDataType,
+      resultDataType: t.resultDataType,
+    })),
   });
 
   return res;
@@ -32,7 +38,13 @@ export async function updateOne(
 
   const res = await db.test.update({
     where: { id: test.id },
-    data: { exerciseId, inputs: test.inputs, result: test.result },
+    data: {
+      exerciseId,
+      inputs: test.inputs,
+      result: test.result,
+      inputDataType: test.inputDataType,
+      resultDataType: test.resultDataType,
+    },
   });
 
   return res;
