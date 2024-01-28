@@ -1,7 +1,6 @@
 import { IExerciseFileContent } from "../types/exerciseTypes";
 import * as errorHandling from "../errors/errorHandling";
 import * as exerciseRepository from "../repositories/exerciseRepository";
-import * as testRepository from "../repositories/testRepository";
 import * as resolutionRepository from "../repositories/resolutionRepository";
 import { TCreateResolutionPayload } from "../types/resolutionTypes";
 
@@ -54,7 +53,6 @@ export async function validateExerciseId(exerciseId: string) {
     throw errorHandling.notFound("Exercise id not found");
   }
 }
-
 
 export async function createResolution(userId: string, exerciseId: string, body: TCreateResolutionPayload) {
   await validateExerciseId(exerciseId);
