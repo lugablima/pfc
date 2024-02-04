@@ -16,3 +16,24 @@ export async function findOneById(userId: string): Promise<TUser | null> {
 export async function insertOne(user: SignUpUser) {
   await prisma.user.create({ data: user });
 }
+
+export async function findAllResolutionsByUser() {
+  const resolutions = await prisma.user.findMany({
+    include: {
+      resolutions: {
+        where: {
+          exercise: {
+            class: {
+              isEnabled: true,
+            },
+          },
+        },
+      },
+    },
+    where: {
+      isAdmin: false,
+    },
+  });
+
+  return resolutions;
+}

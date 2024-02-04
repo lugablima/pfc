@@ -4,6 +4,7 @@ import { IExerciseFileContent } from "../types/exerciseTypes";
 import * as errorHandling from "../errors/errorHandling";
 import * as exerciseRepository from "../repositories/exerciseRepository";
 import * as resolutionRepository from "../repositories/resolutionRepository";
+import * as userRepository from "../repositories/userRepository";
 import { TCreateResolutionPayload } from "../types/resolutionTypes";
 
 /* eslint-disable no-restricted-syntax */
@@ -65,6 +66,23 @@ export function validateClassDueDate(rawDueDate: Date) {
   if (dueDate.isSameOrBefore(now)) {
     throw errorHandling.badRequest("The due date for the exercise has passed.");
   }
+}
+
+export async function getAllForDashboard() {
+  const exercisesCount = await exerciseRepository.getExercisesCount();
+
+  const users = await userRepository.findAllResolutionsByUser();
+
+  const usersData = users.map((user) => ({
+    id: user.id,
+    name: user.name,
+    resolutionsCount: user.resolutions.length,
+  }));
+
+  return {
+    exercisesCount,
+    users: usersData,
+  };
 }
 
 export async function createResolution(userId: string, exerciseId: string, body: TCreateResolutionPayload) {
