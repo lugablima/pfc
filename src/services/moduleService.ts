@@ -73,13 +73,13 @@ export async function create(module: ModulePayload) {
       },
     });
 
-    for (const _class of module.classes) {
+    for (const [classIdx, _class] of Object.entries(module.classes)) {
       await validateClass({ ..._class, moduleId });
 
       exerciseService.validateExerciseContent(_class.exerciseFile.content);
 
       const { id: classId } = await classRepository.insertOne(
-        { ..._class, moduleId, dueDate: moment.parseZone(_class.dueDate).toDate() },
+        { ..._class, sequence: Number(classIdx) + 1, moduleId, dueDate: moment.parseZone(_class.dueDate).toDate() },
         tx,
       );
 
@@ -117,7 +117,7 @@ export async function edit(module: EditModulePayload, moduleId: string) {
 
     if (!module.classes) return;
 
-    for (const _class of module.classes) {
+    for (const [classIdx, _class] of Object.entries(module.classes)) {
       await validateClass({ ..._class, moduleId });
 
       await validateClassId(_class.id, moduleId);
@@ -125,6 +125,7 @@ export async function edit(module: EditModulePayload, moduleId: string) {
       await classService.validateClassNameConflictInModule(
         {
           name: _class.name,
+          sequence: Number(classIdx) + 1,
           dueDate: _class.dueDate,
           imageUrl: _class.imageUrl,
           moduleId,
@@ -138,7 +139,7 @@ export async function edit(module: EditModulePayload, moduleId: string) {
       exerciseService.validateExerciseContent(_class.exerciseFile.content);
 
       const { id: classId } = await classRepository.updateOne(
-        { ..._class, moduleId, dueDate: moment.parseZone(_class.dueDate).toDate() },
+        { ..._class, sequence: Number(classIdx) + 1, moduleId, dueDate: moment.parseZone(_class.dueDate).toDate() },
         tx,
       );
 
@@ -148,12 +149,10 @@ export async function edit(module: EditModulePayload, moduleId: string) {
 
       const contentParsed: IEditExerciseFileContent = JSON.parse(_class.exerciseFile.content);
 
-      for (const exercise of contentParsed.exercises) {
-        const { id: exerciseId } = await exerciseRepository.updateOne(exercise, classId, tx);
+      for (const [idx, exercise] of Object.entries(contentParsed.exercises)) {
+        const { id: exerciseId } = await exerciseRepository.createOne(exercise, Number(idx) + 1, classId, tx);
 
-        for (const test of exercise.tests) {
-          await testRepository.updateOne(test, exerciseId, tx);
-        }
+        await testRepository.createMany(exercise.tests, exerciseId, tx);
       }
     }
   });

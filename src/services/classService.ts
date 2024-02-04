@@ -77,10 +77,13 @@ export async function create(_class: ClassPayload) {
 
   exerciseService.validateExerciseContent(_class.exerciseFile.content);
 
+  const classes = await classRepository.getAll(_class.moduleId);
+
   await prisma.$transaction(async (tx) => {
     const { id: classId } = await classRepository.insertOne(
       {
         ..._class,
+        sequence: classes ? classes.length + 1 : 0,
         dueDate: moment.parseZone(_class.dueDate).toDate(),
       },
       tx,
@@ -103,19 +106,29 @@ export async function edit(_class: ClassPayload, classId: string) {
 
   exerciseService.validateExerciseContent(_class.exerciseFile.content);
 
+  const classInDb = await classRepository.findOneById(classId);
+
   await prisma.$transaction(async (tx) => {
+    await classRepository.updateOne(
+      {
+        ..._class,
+        sequence: classInDb?.sequence as number,
+        id: classId,
+        dueDate: moment.parseZone(_class.dueDate).toDate(),
+      },
+      tx,
+    );
+
     await exerciseRepository.deleteManyByClassId(classId);
 
     await testRepository.deleteManyByClassId(classId);
 
     const contentParsed: IEditExerciseFileContent = JSON.parse(_class.exerciseFile.content);
 
-    for (const exercise of contentParsed.exercises) {
-      const { id: exerciseId } = await exerciseRepository.updateOne(exercise, classId, tx);
+    for (const [idx, exercise] of Object.entries(contentParsed.exercises)) {
+      const { id: exerciseId } = await exerciseRepository.createOne(exercise, Number(idx) + 1, classId, tx);
 
-      for (const test of exercise.tests) {
-        await testRepository.updateOne(test, exerciseId, tx);
-      }
+      await testRepository.createMany(exercise.tests, exerciseId, tx);
     }
   });
 }
