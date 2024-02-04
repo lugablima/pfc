@@ -142,6 +142,10 @@ export async function edit(module: EditModulePayload, moduleId: string) {
         tx,
       );
 
+      await exerciseRepository.deleteManyByClassId(classId);
+
+      await testRepository.deleteManyByClassId(classId);
+
       const contentParsed: IEditExerciseFileContent = JSON.parse(_class.exerciseFile.content);
 
       for (const exercise of contentParsed.exercises) {

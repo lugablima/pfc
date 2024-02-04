@@ -49,3 +49,13 @@ export async function updateOne(
 
   return res;
 }
+
+export async function deleteManyByClassId(classId: string) {
+  await prisma.test.deleteMany({
+    where: {
+      exercise: {
+        classId,
+      },
+    },
+  });
+}

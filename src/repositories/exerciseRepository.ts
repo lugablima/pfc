@@ -78,6 +78,14 @@ export async function getOneById(exerciseId: string) {
   return exercise;
 }
 
+export async function deleteManyByClassId(classId: string) {
+  const exercise = await prisma.exercise.deleteMany({
+    where: { classId },
+  });
+
+  return exercise;
+}
+
 export async function getExercisesCount() {
   const exercisesCount = await prisma.exercise.count({
     where: {

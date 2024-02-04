@@ -104,7 +104,9 @@ export async function edit(_class: ClassPayload, classId: string) {
   exerciseService.validateExerciseContent(_class.exerciseFile.content);
 
   await prisma.$transaction(async (tx) => {
-    await classRepository.updateOne({ ..._class, id: classId, dueDate: moment.parseZone(_class.dueDate).toDate() }, tx);
+    await exerciseRepository.deleteManyByClassId(classId);
+
+    await testRepository.deleteManyByClassId(classId);
 
     const contentParsed: IEditExerciseFileContent = JSON.parse(_class.exerciseFile.content);
 
