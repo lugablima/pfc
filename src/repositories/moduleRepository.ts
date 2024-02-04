@@ -1,5 +1,5 @@
 import { prisma } from "../config/prisma";
-import { CreateModule, GetAllModules, TModule } from "../types/moduleTypes";
+import { CreateModule, TModule } from "../types/moduleTypes";
 
 export async function findOneById(id: string): Promise<TModule | null> {
   const module: TModule | null = await prisma.module.findUnique({ where: { id } });
@@ -25,10 +25,18 @@ export async function findOneByName(name: string, distinctId?: string): Promise<
   return module;
 }
 
-export async function getAll(): Promise<GetAllModules[] | null> {
-  const modules: GetAllModules[] | null = await prisma.module.findMany({
-    orderBy: { createdAt: "asc" },
-    select: { id: true, name: true, description: true, imageUrl: true, isEnabled: true, createdAt: true },
+export async function getAll() {
+  const modules = await prisma.module.findMany({
+    orderBy: { sequence: "asc" },
+    select: {
+      id: true,
+      name: true,
+      sequence: true,
+      description: true,
+      imageUrl: true,
+      isEnabled: true,
+      createdAt: true,
+    },
   });
 
   return modules;
@@ -40,13 +48,15 @@ export async function getModuleInfoForEdit(moduleId: string) {
     select: {
       id: true,
       name: true,
+      sequence: true,
       description: true,
       imageUrl: true,
       classes: {
-        orderBy: { createdAt: "asc" },
+        orderBy: { sequence: "asc" },
         select: {
           id: true,
           name: true,
+          sequence: true,
           imageUrl: true,
           dueDate: true,
           video: { select: { url: true } },
@@ -57,7 +67,10 @@ export async function getModuleInfoForEdit(moduleId: string) {
               id: true,
               name: true,
               statement: true,
-              tests: { orderBy: { createdAt: "asc" }, select: { id: true, inputs: true, result: true } },
+              tests: {
+                orderBy: { createdAt: "asc" },
+                select: { id: true, inputs: true, result: true, inputDataType: true, resultDataType: true },
+              },
             },
           },
         },

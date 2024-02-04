@@ -31,6 +31,7 @@ export async function insertOne(
   const res = await db.class.create({
     data: {
       name: _class.name,
+      sequence: _class.sequence,
       imageUrl: _class.imageUrl,
       moduleId: _class.moduleId,
       dueDate: _class.dueDate,
@@ -50,17 +51,19 @@ export async function insertOne(
   return res;
 }
 
-export async function getAll(moduleId: string): Promise<GetAllClasses[] | null> {
-  const classes: GetAllClasses[] | null = await prisma.class.findMany({
+export async function getAll(moduleId: string) {
+  const classes = await prisma.class.findMany({
     where: { moduleId },
-    orderBy: { createdAt: "asc" },
+    orderBy: { sequence: "asc" },
     select: {
       id: true,
       name: true,
+      sequence: true,
       imageUrl: true,
       isEnabled: true,
       moduleId: true,
       dueDate: true,
+      createdAt: true,
       module: { select: { name: true } },
     },
   });
@@ -74,17 +77,22 @@ export async function getClassInfoForEdit(classId: string) {
     select: {
       id: true,
       name: true,
+      sequence: true,
       imageUrl: true,
       dueDate: true,
       video: { select: { url: true } },
       summary: { select: { url: true } },
+      createdAt: true,
       exercises: {
         orderBy: { sequence: "asc" },
         select: {
           id: true,
           name: true,
           statement: true,
-          tests: { orderBy: { createdAt: "asc" }, select: { id: true, inputs: true, result: true } },
+          tests: {
+            orderBy: { createdAt: "asc" },
+            select: { id: true, inputs: true, result: true, inputDataType: true, resultDataType: true },
+          },
         },
       },
     },
@@ -139,6 +147,7 @@ export async function updateOne(
     where: { id: _class.id },
     data: {
       name: _class.name,
+      sequence: _class.sequence,
       imageUrl: _class.imageUrl,
       dueDate: _class.dueDate,
       video: {
