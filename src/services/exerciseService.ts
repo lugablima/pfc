@@ -68,6 +68,16 @@ export function validateClassDueDate(rawDueDate: Date) {
   }
 }
 
+export async function validateUserId(userId: string) {
+  const user = await userRepository.findOneById(userId);
+
+  if (!user) {
+    throw errorHandling.notFound("User not found.");
+  }
+
+  return user;
+}
+
 export async function getAllForDashboard() {
   const exercisesCount = await exerciseRepository.getExercisesCount();
 
@@ -82,6 +92,18 @@ export async function getAllForDashboard() {
   return {
     exercisesCount,
     users: usersData,
+  };
+}
+
+export async function getDashboardDataForUser(userId: string) {
+  const user = await validateUserId(userId);
+
+  const resolutions = await exerciseRepository.getDashboardDataForUser(userId);
+
+  return {
+    id: user.id,
+    name: user.name,
+    exercises: resolutions,
   };
 }
 

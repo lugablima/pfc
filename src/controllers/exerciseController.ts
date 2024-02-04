@@ -7,6 +7,12 @@ export async function getAllForDashboard(req: Request, res: Response) {
   res.status(200).send(exercises);
 }
 
+export async function getDashboardDataForUser(req: Request, res: Response) {
+  const dashboardData = await exerciseService.getDashboardDataForUser(req.params.userId);
+
+  res.status(200).send(dashboardData);
+}
+
 export async function createResolution(req: Request, res: Response) {
   await exerciseService.createResolution(res.locals.userId, req.params.exerciseId, req.body);
 

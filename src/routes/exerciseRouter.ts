@@ -14,5 +14,6 @@ exerciseRouter.post(
 );
 exerciseRouter.use(validateAdmin);
 exerciseRouter.get("/dashboard", exerciseController.getAllForDashboard);
+exerciseRouter.get("/dashboard/:userId", exerciseController.getDashboardDataForUser);
 
 export default exerciseRouter;

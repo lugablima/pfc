@@ -89,3 +89,55 @@ export async function getExercisesCount() {
 
   return exercisesCount;
 }
+
+export async function getDashboardDataForUser(userId: string) {
+  const exercisesCount = await prisma.exercise.findMany({
+    where: {
+      class: {
+        isEnabled: true,
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+      sequence: true,
+      resolutions: {
+        select: {
+          id: true,
+          grade: true,
+          resolution: true,
+        },
+        where: {
+          userId,
+        },
+      },
+      class: {
+        select: {
+          id: true,
+          name: true,
+          sequence: true,
+          createdAt: true,
+          isEnabled: true,
+          module: {
+            select: {
+              id: true,
+              name: true,
+              sequence: true,
+              isEnabled: true,
+              createdAt: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: {
+      class: {
+        module: {
+          sequence: "asc",
+        },
+      },
+    },
+  });
+
+  return exercisesCount;
+}
