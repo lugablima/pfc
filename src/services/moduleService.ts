@@ -11,7 +11,7 @@ import * as exerciseService from "./exerciseService";
 import { prisma } from "../config/prisma";
 import { ClassPayload } from "../types/classTypes";
 import * as moment from "moment";
-import { IEditExerciseFileContent, IExerciseFileContent } from "../types/exerciseTypes";
+import { IExerciseFileContent } from "../types/exerciseTypes";
 
 async function validateModuleNameConflict(module: ModulePayload, moduleId?: string) {
   let registeredModule: TModule | null;
@@ -138,22 +138,22 @@ export async function edit(module: EditModulePayload, moduleId: string) {
 
       exerciseService.validateExerciseContent(_class.exerciseFile.content);
 
-      const { id: classId } = await classRepository.updateOne(
+      await classRepository.updateOne(
         { ..._class, sequence: Number(classIdx) + 1, moduleId, dueDate: moment.parseZone(_class.dueDate).toDate() },
         tx,
       );
 
-      await exerciseRepository.deleteManyByClassId(classId);
+      // await exerciseRepository.deleteManyByClassId(classId);
 
-      await testRepository.deleteManyByClassId(classId);
+      // await testRepository.deleteManyByClassId(classId);
 
-      const contentParsed: IEditExerciseFileContent = JSON.parse(_class.exerciseFile.content);
+      // const contentParsed: IEditExerciseFileContent = JSON.parse(_class.exerciseFile.content);
 
-      for (const [idx, exercise] of Object.entries(contentParsed.exercises)) {
-        const { id: exerciseId } = await exerciseRepository.createOne(exercise, Number(idx) + 1, classId, tx);
+      // for (const [idx, exercise] of Object.entries(contentParsed.exercises)) {
+      //   const { id: exerciseId } = await exerciseRepository.createOne(exercise, Number(idx) + 1, classId, tx);
 
-        await testRepository.createMany(exercise.tests, exerciseId, tx);
-      }
+      //   await testRepository.createMany(exercise.tests, exerciseId, tx);
+      // }
     }
   });
 }
